@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "767188545467",
+    "project_id": "addis-ababa-city-bus",
+    "storage_bucket": "addis-ababa-city-bus.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:767188545467:android:1f84e354d681a3d0ff5e9e",
+        "android_client_info": {
+          "package_name": "com.example.tracker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "767188545467-o100b91l467vp2hovgs0k5qs3471ljva.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBK7T6CqQWl7X4Xord1bhPX0vfefGdM608"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "767188545467-o100b91l467vp2hovgs0k5qs3471ljva.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
