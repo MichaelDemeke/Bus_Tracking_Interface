@@ -1,7 +1,12 @@
-
 import 'package:flutter/material.dart';
+import 'package:tracker/chooseStation.dart';
+import 'package:tracker/constants.dart';
 import 'package:tracker/driver.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:tracker/map.dart';
+import 'package:web_socket_channel/io.dart';
+
+
 
 // Future<void> main() async {
 //   WidgetsFlutterBinding.ensureInitialized();
@@ -28,9 +33,14 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: driver()
+        textTheme: Theme.of(context).textTheme.apply(bodyColor: theamColor),
+       visualDensity: VisualDensity.adaptivePlatformDensity,),
+      home: 
+    chooseStation(channel: new IOWebSocketChannel.connect("ws://echo.websocket.org"),)
+    
+   // MyMap(bus_id: "2")
+    
+    
     );
   }
 }

@@ -5,7 +5,7 @@ import 'package:location/location.dart' as loc;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:firebase_core/firebase_core.dart';
 
-import 'map.dart';
+//import 'map';
 
 class driver extends StatefulWidget {
   const driver({super.key});
@@ -77,9 +77,12 @@ class _driverState extends State<driver> {
                       trailing: IconButton(
                         icon: Icon(Icons.directions),
                         onPressed: () {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) =>
-                                  MyMap(snapshot.data!.docs[index].id)));
+                          // Navigator.of(context).push(MaterialPageRoute(
+                          //     builder: (context) =>
+                          //        MyMap(snapshot.data!.docs[index].id)
+                              
+                          //     )
+                          //   );
                         },
                       ),
                     );
