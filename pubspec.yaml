@@ -21,6 +21,7 @@ version: 1.0.0+1
 environment:
   sdk: '>=2.19.0-334.0.dev <3.0.0'
 
+
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
 # consider running `flutter pub upgrade --major-versions`. Alternatively,
@@ -46,6 +47,9 @@ dependencies:
   latlong2: ^0.8.1
   http: ^0.13.6
   web_socket_channel: ^2.4.0
+  dropdown_search: ^5.0.6
+  dio: ^5.2.1+1
+  #dropdown_search: ^5.0.6
 
 
 
@@ -73,14 +77,9 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-   - assests\images\1.png
-   - assests\images\2.png
-   - assests\icons\back.svg
-   - assests\Bus city.jpg
-   - assests\Bus city.png
    - assests\5.png
-   - assests\icons\back.svg
-   - assests\Bus Bus City Landscape, Bus, City, Landscape Illustration Image on Pngtree, Free Download on Pngtree.jpg
+   - assests\1245.png
+   - assests\789.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

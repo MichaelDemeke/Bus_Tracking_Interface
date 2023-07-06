@@ -5,21 +5,18 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class Station {
    int id;
-   String name;
-  //  LatLng location {
-  //   latitude;
-  //   longitude;
-  //  }
-   LatLng longitude;
-   LatLng latitude; 
+   String station_name;
+   double longitude;
+   double latitude; 
+   int route;
    
   Station({
     required this.id,
-    required this.name,
+    required this.station_name,
     required this. longitude,
-    required this.latitude
-  });
+    required this.latitude,
+    required this.route
 
-  map(DropdownMenuItem<String> Function(dynamic item) param0) {}
+  });
 
 }

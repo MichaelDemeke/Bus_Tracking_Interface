@@ -1,78 +1,70 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:tracker/constants.dart';
-import 'package:tracker/listofroute.dart';
-import 'package:web_socket_channel/io.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
-import '../api.dart';
+import 'package:tracker/listofroutefinal.dart';
+import 'package:tracker/routes.dart';
 import 'package:http/http.dart' as http;
+
 //import 'package:busroutemap/api.dart';
 import 'dart:convert';
 
+//import 'package:dropdown_search/dropdown_search.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 import '../stations.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'constants.dart';
+
 
 class chooseStation extends StatefulWidget {
-  final WebSocketChannel channel;
-   chooseStation({super.key, required this.channel});
+ 
+   chooseStation({super.key});
 
   @override
   State<chooseStation> createState() => _chooseStationState();
 }
 
 class _chooseStationState extends State<chooseStation> {
-  final items = [
-      'Asco Addis Sefer',
-      'Bercheko',
-      'Kawojj', 
-      'Awoliya',
-      'Winget',
-      'fenans',
-  ];
-    final items2 = [
-      'Asco Addis Sefer',
-      'Bercheko',
-      'Kawojj', 
-      'Awoliya',
-      'Winget',
-      'fenans',
-  ];
   List<Station> listStations = [];
-  String?  selectedItem1;
-  String?  selectedItem2;
+   String?  selectedItem1;
+   String? selectedItem2;
+  List<Routes> listRoutes = [];
+  
+  late bool routefound = false;
 
 
   late LatLng initallocation;
 
   void fetchData() async {
     try {
-      http.Response response = await http.get(Uri.parse(api));
+      http.Response response = await http.get(Uri.parse("https://addisbuss.onrender.com/api/user/route/stations"));
+      //http://Addisbuss.onrender.com/api/admin/stations
       var data = jsonDecode(response.body);
       data.forEach((listStat) {
-        // listStations.add(listStat);
         Station ls = Station(
             id: listStat['id'],
-            name: listStat['name'],
+            station_name: listStat['station_name'],
             latitude: listStat['latitude'],
-            longitude: listStat['longitude']);
-        listStations.add(ls);
-       // stationnames.add(listStat['name']);
+            longitude: listStat['longitude'],
+            route: listStat['route']
+            );
+            setState(() {
+                listStations.add(ls);
+                
+            });
+      
       });
-      // var data = response.body;
-      // data = json.decode(data);
-      // print(data);
+       print(data);
       print(response.body.runtimeType);
     } catch (e) {
       print("Error is $e");
     }
-    setState(() {
-      selectedItem1 = "Asco Addis Sefer";
-      selectedItem2 = "winget";
-    });
   }
+
+  late String initialStationName;
+  late String destiationStationName;
+
+  final initStation = TextEditingController();
+  final destinationStation = TextEditingController();
 
     @override
   void initState() {
@@ -86,274 +78,315 @@ class _chooseStationState extends State<chooseStation> {
       child: Scaffold(
         appBar: AppBar(
         backgroundColor: theamColor,
-        elevation: 0,
-        leading: IconButton(
-          icon: SvgPicture.asset('assets/icons/back.svg'),
-          color: Colors.black,
-          onPressed: () => Navigator.pop(context),
-        ),      
-      
+        elevation: 0,     
         ),
-        body:  
-         Container(
+        body: Container(
           decoration: BoxDecoration(
             color: theamColor
           ),
-          child: Column(
-
-            children: [
-
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.90,
-                child: Stack(
-                  children: [
-
-              Center(
-                child: Container(
-                      // height: MediaQuery.of(context).size.height * 0.25,
-                     width: MediaQuery.of(context).size.width,
-                      margin: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.28),
-                      padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.0, 
-                        left: kDefaultPaddin, 
-                         right: kDefaultPaddin,
-                      ),
-                        decoration: BoxDecoration(
-                        color: Colors.grey,
-                                   borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(24),
-                    topRight: Radius.circular(24),
-                  )
-                      ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                             DefaultTextStyle(
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      color: Colors.black,
-                                      //fontFamily: 'Dire_Dawa',
-                                    ),
-                                    textAlign: TextAlign.left,
-                                    child: Text("Enter your Initial Point"),
-                                  ),
-                       
-                          DropdownButton(
-                            value: selectedItem1,
-                            dropdownColor: primaryColor,
-                            iconSize: 10.0,
-                            items: listStations.map((item) => DropdownMenuItem<String>(
-                                  value: item.name,
-                                  child: Center(
-                                      child: Text(
-                                        item.name,
-                                        style: const TextStyle(
-                                            fontSize: 19,
-                                           // fontFamily: 'Dire_Dawa',
-                                            color: Colors.brown,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                  ),
-                                )
-                                .toList(),
-                              onChanged: (item) => setState(() {
-                              selectedItem1 = item;
-                  
-                            }),
-                          ),
-                          
-                          // Drop down button
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(0, 10, 10, 0),
-                          child: Text ("Enter your desrination"),
+          child: Container(
+            width:  MediaQuery.of(context).size.width,
+           height: MediaQuery.of(context).size.height * 0.83,
+            child: Stack(
+              children: [
+          Center(
+            child: Container(
+                 width: MediaQuery.of(context).size.width,
+                  margin: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.28),
+                  // padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.0, 
+                  //   left: defaultPadding, 
+                  //    right: 0,
+                  // ),
+                    decoration: const BoxDecoration(
+                    color: Colors.white,
+                               borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(24),
+                topRight: Radius.circular(24),
+              )
+                  ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.12,
                         ),
-                          Container(
-                            // width: MediaQuery.of(context).size.width * 0.50,
-                            // height: MediaQuery.of(context).size.height * 0.10,
-                            width: MediaQuery.of(context).size.width * 0.70,
-                            height: MediaQuery.of(context).size.height * 0.04,
-                         
-                            child: DropdownButton<String>(
-                              key: GlobalKey(debugLabel: selectedItem2),
-                              value: selectedItem2,
-                              dropdownColor: primaryColor,
-                              iconSize: 10.0,
-                              items: listStations.map((item) => DropdownMenuItem<String>(
-                                      value: item.name,
-                                    child: Center(
-                                        child: Text(
-                                          item.name,
-                                          // style: const TextStyle(
-                                          //     fontSize: 19,
-                                          //    // fontFamily: 'Dire_Dawa',
-                                          //     color: Colors.brown,
-                                          //     fontWeight: FontWeight.bold),
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                  .toList(),
-                                onChanged: (item) => setState(() {
-                                selectedItem2 = item;
-                              }),
-                            ),
+                         const DefaultTextStyle(
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: theamColor,
+                                  //fontFamily: 'Dire_Dawa',
+                                ),
+                                textAlign: TextAlign.left,
+                                child: Text("Enter your Initial Station"),
+                              ),
+                    
+                              DropdownSearch<String>(
+                            popupProps: PopupProps.menu(
+                            showSelectedItems: true,
+                            showSearchBox: true,
+                              fit: FlexFit.loose,
+                              disabledItemFn: (String s) => s.contains(selectedItem2.toString()),
+                                  ),
+                                items: List.from(listStations.map((element) => element.station_name)),
+                                dropdownDecoratorProps: const DropDownDecoratorProps(
+                                dropdownSearchDecoration: InputDecoration(
+                              //labelText: "Menu mode",
+                              hintText: "Century Mall_522 ",
+                                  ),
+                                ),
+                              
+                                
+                              onChanged:(value) {
+                              setState(() {
+                                selectedItem1 = value;
+                              });
+                            },
                             
-                          ),
-             GestureDetector(
-                          child: Container(
-                            width: MediaQuery.of(context).size.width * 0.55,
-                            height: MediaQuery.of(context).size.height * 0.04,
-                  margin: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.16),
-                            decoration: BoxDecoration(color: Colors.green,
-                          borderRadius: BorderRadius.all (Radius.circular(24),
-                        )
+                            selectedItem: null,
+                            
+                              ),
+                    
+                    
+                      
+                      // Drop down button
+                    const Padding(
+                      padding: EdgeInsets.fromLTRB(0, 20, 10, 0),
+                      child: Text ("Enter your desrination station"),
+                    ),
+                    
+                     DropdownSearch<String>(
+                            popupProps: PopupProps.menu(
+                            showSelectedItems: true,
+                            showSearchBox: true,
+                            fit: FlexFit.tight,
+                               disabledItemFn: (String s) => s.contains(selectedItem1.toString()),
                             ),
-                        
+                          items: List.from(listStations.map((element) => element.station_name)),
+                          dropdownDecoratorProps: const DropDownDecoratorProps(
+                          dropdownSearchDecoration: InputDecoration(
+                              //labelText: "Menu mode",
+                              hintText: "Summit Mazoriya_1876",
+                            ),
+                          ),
+                     
+                          
+                        onChanged:(value) {
+                        setState(() {
+                          selectedItem2 = value;
+                        });
+                      },
+                      
+                      selectedItem: null,
+                      
+                     ),
+                               Center(
+                             child: GestureDetector(
+                        child: Container(
+                          width: MediaQuery.of(context).size.width * 0.65,
+                          height: MediaQuery.of(context).size.height * 0.04,
+                                  margin: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.09),
+                          decoration: const BoxDecoration(color: Colors.green,
+                        borderRadius: BorderRadius.all (Radius.circular(24),
+                      )
+                          ),
+                          child: const Center(
                             child: DefaultTextStyle(
                                     style: TextStyle(
                                       fontSize: 15,
-                                      color: Colors.black,
+                                      color: Colors.white,
                                       //fontFamily: 'Dire_Dawa',
                                     ),
                                     textAlign: TextAlign.center,
                                     child: Text('Enter'),
                                   ),
-                        
                           ),
-                          onTap: () {
-                  
-                            sendrequest();
-                             Navigator.of(context).push(MaterialPageRoute(
-                                 builder: (context) =>
-                                    listroute(),
-                                           
-                            )
-                                              );
-                          },
-                        )
-
-
-                        
-                        ]),
+                      
+                        ),
+                        onTap: () async {
+                              print(selectedItem1);
+                          print(selectedItem2);
+                            if(selectedItem1 ==null || selectedItem2 ==null){
+                              _showMyDialog("All the fields are needed to be filled");
+                            }
+                            else{
+                              sendrequest();
+                                if(await sendrequest()){
+                                    Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) =>
+                                    listroute(listRoutes),
+                                )
+                           );
+                          }
+                        }
+                        },
                       ),
-              ),
+                    )                        
+                                  ]),
+                  ),
+          ),
     
     
-
-
-
-    
-                            Padding(
-      padding: const EdgeInsets.symmetric(horizontal: kDefaultPaddin),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-              // DefaultTextStyle(
-              //          style: TextStyle(
-              //               fontSize: 20,
-              //              color: Colors.black,
-              //                   fontWeight: FontWeight.normal),
-              //                     textAlign: TextAlign.left,
-              //                       child: Text('Addis Ababa City Bus Enterprise'),
-              //       ),
-       // SizedBox(height: kDefaultPaddin),
-          Row(
-            children: [
-              RichText(text: TextSpan(
-                children: [
-                    TextSpan(text: "Welcome\n"), 
-                    TextSpan(
-                      text: "Addis Ababa City \n Bus Enterprise ", 
-                      style: Theme.of(context)
-                              .textTheme
-                              .headlineSmall
-                              ?.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold
-                                ),
-                    )
-                ],
+      Container(
+        child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: kDefaultPaddin),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+            RichText(text: TextSpan(
+              children: [
+                  TextSpan(text: "Welcome\n"), 
+                  TextSpan(
+                    text: "Addis Ababa City \n Bus Enterprise ", 
+                    style: Theme.of(context)
+                            .textTheme
+                            .headlineSmall
+                            ?.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold
+                              ),
+                  )
+              ],
+            ),
+            ),
+              ]
+            ), 
+      
+          SizedBox(height: 65),
+            Row(
+              children: [
+            RichText(text: TextSpan(
+              children: [
+                  TextSpan(text: "Enter \n"), 
+                  TextSpan(
+                    text: "Stations", 
+                    style: Theme.of(context)
+                            .textTheme
+                            .headlineSmall
+                            ?.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold
+                              ),
+                  )
+              ],
+            ),
+            ),
+            SizedBox(width:15), 
+            Container(
+              width: 230,
+              height: 120,
+              child: Image.asset("assests/789.png", 
+              fit: BoxFit.contain,
               ),
-              ),
-            ]
-          ), 
-
-        SizedBox(height: 5),
-          Row(
-            children: [
-              RichText(text: TextSpan(
-                children: [
-                    TextSpan(text: "List of\n"), 
-                    TextSpan(
-                      text: "Routes ", 
-                      style: Theme.of(context)
-                              .textTheme
-                              .headlineSmall
-                              ?.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold
-                                ),
-                    )
-                ],
-              ),
-              ),
-              SizedBox(width:0), 
-              Container(
-                width: 250,
-                height: 260,
-                child: Expanded(child: 
-                    Image.asset("assests/5.png", 
-                    fit: BoxFit.fill,
-                    ), 
-                          ),
-              ), 
-            ]
-          )
-        ]
+            ), 
+              ]
+            )
+          ]
+        )
+            ),
       )
-              )
     
     
-              
+          
     
         
-                  ],
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  checkifselected(String? item) {
-    if (item == selectedItem1) {
-      return 1;
-    } else {
-      return 0;
-    }
-  }
-  sendrequest() async{
- listStations.forEach((listStat){
-      if(listStat.name == selectedItem1){
-         initallocation =  LatLng(listStat.latitude as double, listStat.longitude as double);
-      }
- });
-
-initialStation(initallocation);
+  
+  Future<bool> sendrequest() async{
+  addinitaillocation();
     try{
-      var response = await http.post(
-        Uri.parse("http://Addisbuss.onrender.com/api/distance"),
-        body: {"initial": selectedItem1, "destination": selectedItem2}
+    // var url = Uri.http("http://addisbuss.onrender.com", "api/user/route/stations" );
+      var response =  await http.post(
+        Uri.parse("https://addisbuss.onrender.com/api/user/route/stations"),
+        body: json.encode([{"src":selectedItem1,"dest":selectedItem2}]) ,
+          headers: {
+              'Content-type' : 'application/json',
+            },
       );
-      print(response.body);
+      print("try ${response.statusCode}");
+        var data = jsonDecode(response.body);
+        print(data);
+        if (data == "no available route on ${selectedItem1} to ${selectedItem2}"){
+          setState(() {
+            _showMyDialog("no available route on ${selectedItem1} to ${selectedItem2}");
+          });
+         return false;
+        }
+        else{
+      listRoutes.clear();
+      data.forEach((listRoute) {
+        Routes r = Routes(
+          id: listRoute['id'], 
+          route_name: listRoute['route_name'], 
+          route_number: listRoute['route_number']);
+
+          setState(() {
+             listRoutes.add(r);
+          });
+       
+      });
+
+      return true;
+    }
     }
     catch (e) {
-      print(e);
+      _showMyDialog("Unknown Error has occured plaease try again");
+      print("Error ${e}");
+      return false;
     }
   }
+
+  addinitaillocation(){
+      listStations.forEach((listStat){
+      if(listStat.station_name == selectedItem1){
+         initallocation =  LatLng(listStat.latitude, listStat.longitude);
+      }
+      });
+     setState(() {
+
+      initialStation(selectedItem1);
+      initialStationloc(initallocation);   
+ });
+
+}
+Future<void> _showMyDialog( String x) async {
+  String message = x;
+  return showDialog<void>(
+    context: context,
+    barrierDismissible: false, // user must tap button!
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('ERROR'),
+        content:  SingleChildScrollView(
+          child: ListBody(
+            children: <Widget>[
+              Text(message),
+              Text('Press ok to try again'),
+            ],
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: const Text('ok'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
 }
 
 
